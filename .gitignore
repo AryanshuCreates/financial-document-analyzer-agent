@@ -1,0 +1,50 @@
+# Node.js (React frontend)
+node_modules/
+build/
+dist/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python (FastAPI backend)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.env
+.env
+venv/
+env/
+*.sqlite3
+instance/
+*.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage and test output
+coverage/
+htmlcov/
+*.cover
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+junit.xml
+
+# Misc
+*.bak
+*.tmp
