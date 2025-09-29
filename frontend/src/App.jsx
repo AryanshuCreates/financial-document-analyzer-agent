@@ -10,13 +10,12 @@ import AnalysisResults from "./pages/AnalysisResults";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("access_token")
+    !!localStorage.getItem("token")
   );
 
-  // Listen for changes in localStorage (login/logout)
   useEffect(() => {
     const handleStorageChange = () => {
-      setIsAuthenticated(!!localStorage.getItem("access_token"));
+      setIsAuthenticated(!!localStorage.getItem("token"));
     };
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
@@ -24,7 +23,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar isAuthenticated={isAuthenticated} />
+      {isAuthenticated && <Navbar setIsAuthenticated={setIsAuthenticated} />}
       <div className="p-6">
         <Routes>
           <Route
@@ -38,8 +37,6 @@ export default function App() {
             element={<Login onLogin={() => setIsAuthenticated(true)} />}
           />
           <Route path="/register" element={<Register />} />
-
-          {/* Protected routes */}
           <Route
             path="/upload"
             element={

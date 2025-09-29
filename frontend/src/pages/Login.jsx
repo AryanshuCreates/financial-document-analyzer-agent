@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
-import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,11 +19,9 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await api.post("/login", { email, password });
-
-      // Store token in localStorage
       localStorage.setItem("token", res.data.access_token);
 
-      // Redirect to dashboard
+      onLogin();
       navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error(err);
@@ -34,12 +32,15 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-12 space-y-4">
-      <h2 className="text-2xl font-bold text-center">Login</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-sm mx-auto mt-16 p-6 bg-white rounded-xl shadow-md space-y-4"
+    >
+      <h2 className="text-2xl font-bold text-center text-purple-700">Login</h2>
 
       <input
         type="email"
-        className="w-full border rounded p-2"
+        className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-300"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -48,7 +49,7 @@ export default function Login() {
 
       <input
         type="password"
-        className="w-full border rounded p-2"
+        className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-purple-300"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -57,11 +58,18 @@ export default function Login() {
 
       <button
         type="submit"
-        className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
+        className="bg-purple-600 text-white w-full py-2 rounded-lg hover:bg-purple-700 shadow"
         disabled={loading}
       >
         {loading ? "Logging in..." : "Login"}
       </button>
+
+      <p className="text-center text-gray-600 text-sm">
+        Don’t have an account?{" "}
+        <Link to="/register" className="text-purple-600 hover:underline">
+          Register
+        </Link>
+      </p>
     </form>
   );
 }

@@ -5,30 +5,43 @@ export default function Navbar() {
   const { isAuthenticated, logout } = useAuth();
 
   return (
-    <nav className="bg-blue-600 text-white px-6 py-3 flex justify-between items-center">
-      <h1 className="font-bold text-lg">Financial Analyzer</h1>
-      <div className="flex items-center">
+    <nav className="bg-white shadow-md px-6 py-3 flex justify-between items-center">
+      <h1 className="font-bold text-xl text-purple-700">Financial Analyzer</h1>
+
+      <div className="flex items-center space-x-4">
         {isAuthenticated ? (
           <>
-            <Link to="/upload" className="mr-4 hover:underline">
+            <Link
+              to="/upload"
+              className="text-gray-700 hover:text-purple-600 transition-colors"
+            >
               Upload
             </Link>
-            <Link to="/dashboard" className="mr-4 hover:underline">
+            <Link
+              to="/dashboard"
+              className="text-gray-700 hover:text-purple-600 transition-colors"
+            >
               Dashboard
             </Link>
             <button
               onClick={logout}
-              className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+              className="px-3 py-1 rounded-lg bg-gray-200 hover:bg-purple-100 text-gray-700 transition-colors shadow-sm"
             >
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="mr-4 hover:underline">
+            <Link
+              to="/login"
+              className="text-gray-700 hover:text-purple-600 transition-colors"
+            >
               Login
             </Link>
-            <Link to="/register" className="hover:underline">
+            <Link
+              to="/register"
+              className="px-3 py-1 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors shadow-sm"
+            >
               Register
             </Link>
           </>
