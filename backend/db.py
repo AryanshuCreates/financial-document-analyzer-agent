@@ -2,7 +2,7 @@
 import os
 import logging
 from datetime import datetime
-from typing import Optional  
+from typing import Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import ASCENDING
 from dotenv import load_dotenv
@@ -17,6 +17,18 @@ class PyObjectId(ObjectId):
     """
     BSON ObjectId wrapper compatible with Pydantic v2
     """
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if isinstance(v, ObjectId):
+            return str(v)
+        if isinstance(v, str) and ObjectId.is_valid(v):
+            return v
+        raise ValueError(f"Invalid ObjectId: {v}")
+
     @classmethod
     def __get_pydantic_json_schema__(cls, core_schema):
         from pydantic import core_schema
@@ -46,7 +58,6 @@ async def ensure_indexes():
 
 # ---------------- Connection Test ---------------- #
 async def check_db_connection():
-    """Check database connection"""
     try:
         await client.admin.command('ping')
         logger.info("Database connection successful")
@@ -71,7 +82,7 @@ class DocumentModel(BaseModel):
 class AnalysisModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     document_id: str
-    user_id: Optional[str] = None  # now Optional is defined
+    user_id: Optional[str] = None
     query: str
     local_summary: dict
     crew_result: dict

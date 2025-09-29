@@ -8,6 +8,7 @@ export default function Upload() {
 
   const handleUpload = async () => {
     if (!file) return alert("Choose a PDF file");
+
     const fd = new FormData();
     fd.append("file", file);
     fd.append("query", "Summarize financial insights");
@@ -20,8 +21,9 @@ export default function Upload() {
         },
       });
       setDocId(res.data.document_id);
-    } catch {
-      alert("Upload failed");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.detail || "Upload failed");
     }
   };
 

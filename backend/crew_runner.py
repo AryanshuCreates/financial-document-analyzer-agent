@@ -12,10 +12,8 @@ async def run_crew_async(
     timeout_s: int = 300
 ) -> Dict[str, Any]:
     """
-    Run CrewAI analysis with proper error handling and timeout.
-    Circular import is avoided by importing tasks inside this function.
+    Run CrewAI analysis and return structured results.
     """
-    # Lazy import to prevent circular import
     from task import (
         analyze_financial_document,
         investment_analysis,
@@ -46,9 +44,18 @@ async def run_crew_async(
             asyncio.to_thread(crew.kickoff, inputs),
             timeout=timeout_s
         )
+
+        # Parse Crew result into structured dict
+        structured_result = {}
+        for task_name, task_output in result.items():
+            # Convert Crew Output object to string or dict
+            try:
+                structured_result[task_name] = task_output.output  # most Crew tasks store output here
+            except AttributeError:
+                structured_result[task_name] = str(task_output)
         
         logger.info("CrewAI analysis completed successfully")
-        return {"result": str(result), "status": "success"}
+        return {"result": structured_result, "status": "success"}
         
     except asyncio.TimeoutError:
         error_msg = f"CrewAI analysis timed out after {timeout_s} seconds"

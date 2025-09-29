@@ -6,17 +6,19 @@ from tools import ReadFinancialDocumentTool
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-# ---------------- LLM ---------------- #
 llm = LLM(
     provider="gemini",
     api_key=API_KEY,
-    model="gemini-2.5-flash"
+    model="gemini-2.5-flash",
+    project="gen-lang-client-0931582473",
+    location="us-central1"
 )
 
-# ---------------- Tools ---------------- #
+# response = llm.run("Hello world!")  # FIXED LINE
+# print(response)
+
 tools = [ReadFinancialDocumentTool()]
 
-# ---------------- Agent ---------------- #
 financial_analyst = Agent(
     role="Financial Analyst",
     goal="Extract and summarize key metrics from financial reports.",

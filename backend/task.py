@@ -1,4 +1,3 @@
-# task.py
 import logging
 import asyncio
 from typing import Optional, Dict, Any
@@ -14,6 +13,7 @@ from db import db
 logger = logging.getLogger(__name__)
 
 # ---------------- CrewAI Tasks ---------------- #
+# Removed async_execution=True to prevent Crew errors
 analyze_financial_document = Task(
     description="""
     Analyze the provided financial document text: {document_text}
@@ -34,8 +34,7 @@ analyze_financial_document = Task(
     - Investment insights based on the data
     - Data quality and completeness assessment
     """,
-    agent=financial_analyst,
-    async_execution=True
+    agent=financial_analyst
 )
 
 investment_analysis = Task(
@@ -58,8 +57,7 @@ investment_analysis = Task(
     - Growth potential assessment
     - Recommended investment timeline
     """,
-    agent=financial_analyst,
-    async_execution=True
+    agent=financial_analyst
 )
 
 risk_assessment = Task(
@@ -82,8 +80,7 @@ risk_assessment = Task(
     - Recommended mitigation strategies
     - Overall risk score and rating
     """,
-    agent=financial_analyst,
-    async_execution=True
+    agent=financial_analyst
 )
 
 verification_task = Task(
@@ -104,8 +101,7 @@ verification_task = Task(
     - Identified limitations
     - Recommendations for additional analysis if needed
     """,
-    agent=financial_analyst,
-    async_execution=True
+    agent=financial_analyst
 )
 
 # ---------------- Orchestrator ---------------- #

@@ -1,39 +1,67 @@
 import { useState } from "react";
 import api from "../api";
-import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await api.post("/login", { email, password });
-      login(res.data.access_token);
+
+      // Store token in localStorage
+      localStorage.setItem("token", res.data.access_token);
+
+      // Redirect to dashboard
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      alert("Login failed");
+      console.error(err);
+      alert(err.response?.data?.detail || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-12 space-y-4">
-      <h2 className="text-xl font-bold">Login</h2>
+      <h2 className="text-2xl font-bold text-center">Login</h2>
+
       <input
-        className="w-full border p-2"
+        type="email"
+        className="w-full border rounded p-2"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        required
       />
+
       <input
         type="password"
-        className="w-full border p-2"
+        className="w-full border rounded p-2"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
       />
-      <button className="bg-blue-600 text-white px-4 py-2 w-full">Login</button>
+
+      <button
+        type="submit"
+        className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
+        disabled={loading}
+      >
+        {loading ? "Logging in..." : "Login"}
+      </button>
     </form>
   );
 }

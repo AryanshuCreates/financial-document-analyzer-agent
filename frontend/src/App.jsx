@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
@@ -8,20 +9,41 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AnalysisResults from "./pages/AnalysisResults";
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("access_token")
+  );
+
+  // Listen for changes in localStorage (login/logout)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem("access_token"));
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar isAuthenticated={isAuthenticated} />
       <div className="p-6">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <Navigate to={isAuthenticated ? "/dashboard" : "/login"} />
+            }
+          />
+          <Route
+            path="/login"
+            element={<Login onLogin={() => setIsAuthenticated(true)} />}
+          />
           <Route path="/register" element={<Register />} />
 
           {/* Protected routes */}
           <Route
             path="/upload"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
                 <Upload />
               </ProtectedRoute>
             }
@@ -29,7 +51,7 @@ export default function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -37,7 +59,7 @@ export default function App() {
           <Route
             path="/analysis/:documentId"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
                 <AnalysisResults />
               </ProtectedRoute>
             }
