@@ -1,37 +1,32 @@
 # models.py
 from typing import Optional, Any, Dict
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer, field_validator
 from datetime import datetime
 from bson import ObjectId
 
-# ---------------- Pydantic v2 compatible ObjectId ---------------- #
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __get_pydantic_json_schema__(cls, schema):
-        return {"type": "string", "pattern": "^[0-9a-fA-F]{24}$"}
-
 # ---------------- User Model ---------------- #
 class UserModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: str = Field(..., alias="_id")
     email: str
     name: Optional[str] = None
     created_at: Optional[datetime] = None
+    role: str = "viewer"
 
     model_config = {
+        "populate_by_name": True,
         "arbitrary_types_allowed": True,
-        "json_encoders": {ObjectId: str},
-        "validate_by_name": True
     }
+
+    # Convert ObjectId -> str automatically
+    @field_validator("id", mode="before")
+    def convert_objectid(cls, v):
+        if isinstance(v, ObjectId):
+            return str(v)
+        return v
+
+    @field_serializer("id")
+    def serialize_id(self, v):
+        return str(v)
 
 # ---------------- Response Models ---------------- #
 class DocumentResponse(BaseModel):
