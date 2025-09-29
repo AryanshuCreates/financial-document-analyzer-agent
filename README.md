@@ -79,25 +79,27 @@ Copy code
 cd ../backend
 uvicorn main:app --reload
 Open the frontend at: http://localhost:5173
+```
 
-Usage
-Register as Admin or Viewer.
+## Usage
 
-Log in to the application.
+1. **Register** as Admin or Viewer.
+2. **Log in** to the application.
+3. **Admin users**: Can upload PDFs and view all documents.
+4. **Viewer users**: Can only view dashboards and analyses.
+5. Click **View Results** to see detailed analysis, including CrewAI output and local summary.
 
-Admin users: Can upload PDFs and view all documents.
+---
 
-Viewer users: Can only view dashboards and analyses.
+## Folder Structure
 
-Click View Results to see detailed analysis, including CrewAI output and local summary.
-
-Folder Structure
-bash
-Copy code
+```bash
 financial-document-analyzer-agent/
 ├─ backend/         # FastAPI backend code
 ├─ frontend/        # React + Tailwind frontend
 ├─ README.md        # Project overview & setup
+```
+
 API Endpoints
 Method	Endpoint	Description
 POST	/register	Register a new user
@@ -107,4 +109,4 @@ GET	/documents	Get list of uploaded documents
 GET	/analysis/{document_id}	Get analysis results
 DELETE	/documents/{document_id}	Delete a document and analysis
 GET	/health	Health check endpoint
-```
+
