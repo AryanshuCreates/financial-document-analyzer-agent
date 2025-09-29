@@ -66,7 +66,7 @@ venv\Scripts\activate
 # Mac/Linux:
 source venv/bin/activate
 
-pip install -r requirements.txt
+pip install -r newRequirements.txt
 Frontend setup
 bash
 Copy code
