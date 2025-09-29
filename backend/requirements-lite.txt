@@ -1,0 +1,47 @@
+# Lite requirements (install first)
+# Python 3.11.x Required
+
+# make sure these are installed first
+
+# pip install requests==2.32.4
+# pip install crewai==0.130.0 crewai-tools==0.47.1
+# pip install onnxruntime>=1.22.0
+# pip install "opentelemetry-api>=1.30.0" "opentelemetry-sdk>=1.30.0" \
+#             "opentelemetry-proto>=1.30.0" "opentelemetry-instrumentation>=0.47b0"
+# pip install google-cloud-aiplatform google-cloud-bigquery google-cloud-storage \
+#             google-cloud-resource-manager google-ai-generativelanguage google-generativeai
+
+
+click>=8.1.8
+
+# Web backend
+fastapi==0.110.3
+uvicorn[standard]>=0.29.0
+aiofiles>=23.2.1
+# Database
+motor==3.4.0
+
+
+# Templates & Validation
+Jinja2==3.1.4
+jsonschema>=4.22.0
+pydantic>=2.6.0
+pydantic_core>=2.18.0
+
+# LangChain & Utils
+langchain-core>=0.3.75
+langsmith>=0.1.125
+packaging>=24.2
+
+
+# Data & ML (light essentials)
+numpy>=1.26.4
+pandas>=2.2.2
+pillow>=10.3.0
+protobuf>=4.25.3
+
+# OpenAI client
+openai>=1.30.5
+
+# Packaging
+pip>=24.0

@@ -1,60 +1,90 @@
-## Importing libraries and files
+# tools.py
 import os
+import re
+import logging
+import asyncio
+from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
+logger = logging.getLogger(__name__)
 
-from crewai_tools import tools
-from crewai_tools.tools.serper_dev_tool import SerperDevTool
+from crewai.tools import BaseTool
 
-## Creating search tool
-search_tool = SerperDevTool()
+# ---------------- PDF Tool Class ---------------- #
+class ReadFinancialDocumentTool(BaseTool):
+    name: str = "read_financial_document"
+    description: str = "Reads and extracts text from a PDF financial document."
 
-## Creating custom pdf reader tool
-class FinancialDocumentTool():
-    async def read_data_tool(path='data/sample.pdf'):
-        """Tool to read data from a pdf file from a path
+    async def _run(self, path: str) -> str:
+        if not isinstance(path, (str, Path)):
+            raise ValueError("Path must be a string or Path object")
+        path = str(path)
+        text = await self.extract_text_from_pdf(path)
+        if len(text.strip()) < 100:  # fallback to OCR
+            ocr_text = await self.ocr_pdf(path)
+            if len(ocr_text.strip()) > len(text.strip()):
+                text = ocr_text
+        if not text.strip():
+            raise ValueError("No text could be extracted from the PDF")
+        return text
 
-        Args:
-            path (str, optional): Path of the pdf file. Defaults to 'data/sample.pdf'.
+    async def extract_text_from_pdf(self, path: str) -> str:
+        from pypdf import PdfReader
 
-        Returns:
-            str: Full Financial Document file
-        """
-        
-        docs = Pdf(file_path=path).load()
+        def _extract():
+            reader = PdfReader(path)
+            text_parts = []
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text_parts.append(page_text)
+            return "\n".join(text_parts)
 
-        full_report = ""
-        for data in docs:
-            # Clean and format the financial document data
-            content = data.page_content
-            
-            # Remove extra whitespaces and format properly
-            while "\n\n" in content:
-                content = content.replace("\n\n", "\n")
-                
-            full_report += content + "\n"
-            
-        return full_report
+        return re.sub(r'\s+', ' ', await asyncio.to_thread(_extract)).strip()
 
-## Creating Investment Analysis Tool
-class InvestmentTool:
-    async def analyze_investment_tool(financial_document_data):
-        # Process and analyze the financial document data
-        processed_data = financial_document_data
-        
-        # Clean up the data format
-        i = 0
-        while i < len(processed_data):
-            if processed_data[i:i+2] == "  ":  # Remove double spaces
-                processed_data = processed_data[:i] + processed_data[i+1:]
-            else:
-                i += 1
-                
-        # TODO: Implement investment analysis logic here
-        return "Investment analysis functionality to be implemented"
+    async def ocr_pdf(self, path: str) -> str:
+        try:
+            from pdf2image import convert_from_path
+            import pytesseract
 
-## Creating Risk Assessment Tool
-class RiskTool:
-    async def create_risk_assessment_tool(financial_document_data):        
-        # TODO: Implement risk assessment logic here
-        return "Risk assessment functionality to be implemented"
+            def _ocr():
+                text_parts = []
+                pages = convert_from_path(path, dpi=200, fmt="jpeg")
+                for page in pages:
+                    page_text = pytesseract.image_to_string(page, config='--psm 6')
+                    if page_text.strip():
+                        text_parts.append(page_text)
+                return "\n".join(text_parts)
+
+            return re.sub(r'\s+', ' ', await asyncio.to_thread(_ocr)).strip()
+        except ImportError:
+            logger.warning("OCR dependencies not installed. Install pdf2image and pytesseract for OCR support.")
+            return ""
+
+# ---------------- Wrapper Functions ---------------- #
+async def read_financial_document(path: str) -> str:
+    """Standalone function for text extraction from PDF."""
+    tool = ReadFinancialDocumentTool()
+    return await tool._run(path)
+
+async def analyze_investment_text(text: str) -> dict:
+    """Basic financial text analysis without CrewAI dependencies."""
+    if not text or not text.strip():
+        return {"error": "No text to analyze"}
+
+    word_count = len(text.split())
+    financial_keywords = [
+        'revenue', 'profit', 'loss', 'assets', 'liabilities', 'equity',
+        'cash flow', 'dividend', 'earnings', 'investment', 'risk',
+        'market', 'growth', 'volatility', 'returns'
+    ]
+    found_keywords = [kw for kw in financial_keywords if kw.lower() in text.lower()]
+
+    return {
+        "summary": text[:500] + "..." if len(text) > 500 else text,
+        "word_count": word_count,
+        "financial_keywords_found": found_keywords,
+        "confidence": min(len(found_keywords) / len(financial_keywords), 1.0),
+        "analysis_type": "basic_text_analysis"
+    }
