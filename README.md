@@ -79,7 +79,62 @@ Copy code
 cd ../backend
 uvicorn main:app --reload
 Open the frontend at: http://localhost:5173
+
 ```
+
+---
+
+## Google Cloud Setup (Vertex AI)
+
+To use CrewAI with Vertex AI for document analysis, you’ll need a Google Cloud project with the right permissions.
+
+### 1. Create a GCP Project
+- Go to [Google Cloud Console](https://console.cloud.google.com/).
+- Click **Create Project** and give it a name (e.g., `financial-doc-analyzer`).
+- Note the **Project ID**.
+
+### 2. Enable Vertex AI API
+- In the Cloud Console, navigate to **APIs & Services > Library**.
+- Search for **Vertex AI API** and click **Enable**.
+
+### 3. Set Up Service Account
+- Go to **IAM & Admin > Service Accounts**.
+- Create a new service account (e.g., `vertexai-analyzer`).
+- Assign the following roles:
+  - `Vertex AI Administrator`
+  - `Service Account User`
+- Generate a JSON key and download it (this will be used for authentication).
+
+### 4. Authenticate Locally
+Set the environment variable to point to your service account key file:
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account.json"
+```
+### On Windows (PowerShell):
+```
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\service-account.json"
+
+```
+Environment Variables (.env)
+
+Create a .env file in the backend/ directory with the following:
+``` env
+MONGO_URI = mongodb://localhost:27017/financial_analyzer
+DB_NAME=financial_analyzer
+# Security
+ACCESS_TOKEN_EXPIRE_SECONDS=86400
+JWT_SECRET = 
+GEMINI_API_KEY = 
+GEMINI_MODEL=gemini-2.0-flash-exp
+# Application
+ALLOWED_ORIGINS=https://yourdomain.com
+UPLOAD_DIR=data
+MAX_FILE_SIZE_MB=10
+# Logging
+LOG_LEVEL=INFO
+```
+
 
 ## Usage
 
