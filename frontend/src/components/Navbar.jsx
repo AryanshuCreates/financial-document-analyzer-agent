@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
+  const { logout } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (token) setIsAuthenticated(true);
+  }, [token]);
 
   return (
     <nav className="bg-white shadow-md px-6 py-3 flex justify-between items-center">
