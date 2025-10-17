@@ -3,28 +3,38 @@ import { useState, useEffect } from "react";
 
 export default function useAuth() {
   const navigate = useNavigate();
-  const [token, setToken] = useState(localStorage.getItem("access_token"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [isAuthenticatedState, setIsAuthenticatedState] = useState(!!token);
 
   const login = (newToken) => {
-    localStorage.setItem("access_token", newToken);
+    localStorage.setItem("token", newToken);
     setToken(newToken);
+    setIsAuthenticatedState(true);
     navigate("/dashboard", { replace: true });
   };
 
   const logout = () => {
-    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
     setToken(null);
+    setIsAuthenticatedState(false);
     navigate("/login", { replace: true });
+    window.location.reload();
+    console.log("Logged out successfully");
   };
 
-  const isAuthenticated = () => !!token;
-
-  // Keep state in sync if localStorage changes elsewhere
   useEffect(() => {
-    const handleStorage = () => setToken(localStorage.getItem("access_token"));
+    setIsAuthenticatedState(!!token);
+  }, [token]);
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const newToken = localStorage.getItem("token");
+      setToken(newToken);
+      setIsAuthenticatedState(!!newToken);
+    };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+  }, [token]);
 
-  return { login, logout, isAuthenticated };
+  return { login, logout, isAuthenticatedState };
 }

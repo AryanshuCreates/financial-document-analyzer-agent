@@ -23,7 +23,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {isAuthenticated && <Navbar setIsAuthenticated={setIsAuthenticated} />}
+      {<Navbar setIsAuthenticated={setIsAuthenticated} />}
       <div className="p-6">
         <Routes>
           <Route
